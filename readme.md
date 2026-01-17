@@ -38,7 +38,6 @@ To run the source code locally, follow these steps:
 - **FFmpeg binaries**: `ffmpeg.exe` and `ffprobe.exe` must be placed in the project root folder to handle media conversion.
 
 ### 2. Clone the Repository
-```bash
 git clone [https://github.com/VishalGajjar-GIT/YouTube-Pro-Downloader.git](https://github.com/VishalGajjar-GIT/YouTube-Pro-Downloader.git)
 cd YouTube-Pro-Downloader
 
