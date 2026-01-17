@@ -51,3 +51,10 @@ Processing: FFmpeg for seamless audio extraction and video merging.
 Data Persistence: JSON for saving user preferences (default paths).
 
 Threading: Python Threading module to ensure the GUI remains responsive during large downloads.
+
+🤝 Contributing & Feedback
+As this is an MVP, we are actively looking for feedback!
+
+Found a bug? Open an Issue.
+
+Want a feature? Start a discussion in the repository.
