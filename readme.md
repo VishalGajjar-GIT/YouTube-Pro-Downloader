@@ -38,7 +38,6 @@ To run the source code locally, follow these steps:
 - **FFmpeg binaries**: `ffmpeg.exe` and `ffprobe.exe` must be placed in the project root folder to handle media conversion.
 
 ### 2. Clone the Repository
-```bash
 git clone [https://github.com/VishalGajjar-GIT/YouTube-Pro-Downloader.git](https://github.com/VishalGajjar-GIT/YouTube-Pro-Downloader.git)
 cd YouTube-Pro-Downloader
 
@@ -52,3 +51,10 @@ Processing: FFmpeg for seamless audio extraction and video merging.
 Data Persistence: JSON for saving user preferences (default paths).
 
 Threading: Python Threading module to ensure the GUI remains responsive during large downloads.
+
+🤝 Contributing & Feedback
+As this is an MVP, we are actively looking for feedback!
+
+Found a bug? Open an Issue.
+
+Want a feature? Start a discussion in the repository.
