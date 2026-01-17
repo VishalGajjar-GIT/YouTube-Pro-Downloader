@@ -4,10 +4,20 @@ import threading
 import os
 import re
 import json
+import sys
 from tkinter import filedialog
 
-# --- CONFIGURATION ---
+# --- CONFIGURATION & PATH LOGIC ---
 SETTINGS_FILE = "settings.json"
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
@@ -18,7 +28,7 @@ class DownloaderApp(ctk.CTk):
 
         # Window Setup
         self.title("ProStream Downloader v3.0")
-        self.geometry("650x580")
+        self.geometry("650x600")
 
         # Load Saved Path
         self.download_path = self.load_settings()
@@ -104,10 +114,7 @@ class DownloaderApp(ctk.CTk):
             percent = d.get('_percent_str', '0%')
             speed = d.get('_speed_str', 'N/A')
             eta = d.get('_eta_str', 'N/A')
-            
-            # Clean ANSI escape codes from percent string
             clean_p = re.sub(r'\x1b\[[0-9;]*m', '', percent).strip().replace('%', '')
-            
             try:
                 p_float = float(clean_p) / 100
                 self.progress_bar.set(p_float)
@@ -120,26 +127,27 @@ class DownloaderApp(ctk.CTk):
         if not url:
             self.status_label.configure(text="Please enter a URL!", text_color="red")
             return
-            
         self.log_box.delete("0.0", "end")
         self.progress_bar.set(0)
-        # Daemon=True ensures the thread closes if you exit the app
         threading.Thread(target=self.download, args=(url, mode), daemon=True).start()
 
     def download(self, url, mode):
         try:
-            self.log("🔍 Analyzing link and fetching metadata...")
+            self.log("🔍 Analyzing link...")
             self.status_label.configure(text="Initializing...", text_color="yellow")
+
+            # Pointing FFmpeg to the internal EXE resource path
+            ffmpeg_dir = resource_path(".")
 
             ydl_opts = {
                 'outtmpl': f'{self.download_path}/%(title)s.%(ext)s',
-                'noplaylist': True,  # Ensures only the single video is grabbed
+                'noplaylist': True,
                 'progress_hooks': [self.progress_hook],
-                'ffmpeg_location': os.getcwd(), # Looks for ffmpeg.exe in the current folder
+                'ffmpeg_location': ffmpeg_dir, 
             }
 
             if mode == 'audio':
-                self.log("🎵 Setting mode: MP3 Extraction")
+                self.log("🎵 Mode: MP3 Extraction")
                 ydl_opts.update({
                     'format': 'bestaudio/best',
                     'postprocessors': [{
@@ -149,23 +157,19 @@ class DownloaderApp(ctk.CTk):
                     }],
                 })
             else:
-                self.log("🎬 Setting mode: Video (Best Quality)")
+                self.log("🎬 Mode: Video (MP4)")
                 ydl_opts.update({'format': 'bestvideo+bestaudio/best'})
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
                 self.log(f"📦 Title: {info.get('title')}")
-                self.log(f"⏱️ Duration: {info.get('duration_string')}")
-                
                 ydl.download([url])
             
-            self.log("💿 Finalizing and converting file...")
             self.log("✨ Success! Download Complete.")
             self.status_label.configure(text="Download Successful!", text_color="green")
             
         except Exception as e:
-            error_msg = str(e).split('\n')[0] # Get only the first line of error
-            self.log(f"❌ Error: {error_msg}")
+            self.log(f"❌ Error: {str(e)}")
             self.status_label.configure(text="Download Failed", text_color="red")
 
 if __name__ == "__main__":
