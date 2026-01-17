@@ -4,3 +4,6 @@ venv/
 *.json
 ffmpeg.exe
 ffprobe.exe
+build/
+dist/
+*.spec
